@@ -18,7 +18,9 @@ Depends:
     R (>= 3.5)
 RoxygenNote: 7.3.3
 Imports: 
+    caTools,
     cli,
     dplyr,
     Matrix,
+    matrixStats,
     tibble
