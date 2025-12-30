@@ -89,7 +89,7 @@ addGenome <- function(genome, name = "userDefined") {
 .fetchGenome <- function(name) {
   stopifnot(is.character(name))
   stopifnot(length(name) == 1)
-  result <- try(utils::getFromNamespace(x = name, ns = "Infercna"))
+  result <- try(eval(str2expression(paste0('Infercna::', name))))
   if (inherits(result, "try-error")) {
     cli::cli_abort("Genome name {.val {name}} does not exist in package data.")
   }
