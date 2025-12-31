@@ -21,6 +21,12 @@ Imports:
     caTools,
     cli,
     dplyr,
+    ggplot2,
+    magrittr,
     Matrix,
     matrixStats,
-    tibble
+    rlang,
+    scales,
+    stringr,
+    tibble,
+    tidyr
