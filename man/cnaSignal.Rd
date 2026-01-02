@@ -9,7 +9,8 @@ cnaSignal(
   gene.quantile = NULL,
   cell.quantile.for.genes = NULL,
   refCells = NULL,
-  samples = NULL
+  samples = NULL,
+  ...
 )
 }
 \arguments{
@@ -17,7 +18,13 @@ cnaSignal(
 
 \item{gene.quantile}{calculate CNA measures including only top / "hotspot" genes according to their squared CNA values across all cells. Value between 0 and 1 denoting the quantile of genes to include. Default: NULL}
 
+\item{cell.quantile.for.genes}{calculate CNA measures including only top / "hotspot" cells according to their squared CNA values across all genes. Value between 0 and 1 denoting the quantile of cells to include. Default: NULL}
+
 \item{refCells}{a character vector of cell ids (e.g. normal reference cell ids) to exclude from calculation of cnaHotspotGenes. Only relevant if gene.quantile is not NULL. Default: NULL}
+
+\item{samples}{if cnaHotspotGenes should be calculated within cell subgroups, provide i) a list of cell id groups, ii) a character vector of sample names to group cells by, iii) TRUE to extract sample names from cell ids and subsequently group. Default: NULL}
+
+\item{...}{other arguments passed to unique_sample_names if samples = TRUE.}
 }
 \value{
 a numeric vector of CNA signal values or the Mean of Squared CNA values
