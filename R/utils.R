@@ -182,3 +182,5 @@ runMean <- function(m, k = 100, endrule = "mean", align = "center", verbose = T)
 
   mout
 }
+
+
