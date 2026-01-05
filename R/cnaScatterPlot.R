@@ -1,3 +1,4 @@
+#'
 #' @title Visualise Malignant and Non-Malignant Subsets
 #' @description Visualise Malignant and Non-Malignant Subsets of cells. This is achieved by plotting, for each cell, its CNA signal over its CNA correlation. Please see `infercna::cnaSignal` and `infercna::cnaCor` for details.
 #'
@@ -11,7 +12,7 @@
 #' @importFrom rlang .data
 #' @import ggplot2
 #'
-#' @return a base R plot. If return value is saved to a variable, instead returns data points for cna correlations and cna signal in list form.
+#' @return return a list of cna signal, cna correlation, and ggplot object of plot.
 #' @rdname cnaScatterPlot
 #' @export
 #'
@@ -32,14 +33,14 @@ cnaScatterPlot <- function(cna,
   plot_data <- data.frame(cna_cor = cna_cor, cna_score = cna_score)
 
   p <- ggplot(data = plot_data) +
-    aes(x = .data[['cna_cor']], y = .data[['cna_score']]) +
+    aes(x = .data[['cna_score']], y = .data[['cna_cor']]) +
     geom_point() +
-    labs(x = 'CNA Correlation', y = 'CNA Signal') +
+    labs(x = 'CNA Signal', y = 'CNA Correlation') +
     theme_classic() +
     theme(panel.border = element_rect(colour = 'black'),
           axis.line = element_blank())
 
   print(p)
 
-  return(invisible(list(cna_cor = cna_cor, cna_score = cna_score, plot = p)))
+  return(invisible(list(cna_cor = cna_cor, cna_signal = cna_score, plot = p)))
 }
