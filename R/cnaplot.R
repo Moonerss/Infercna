@@ -1,5 +1,21 @@
-.ggcna_prep <- function(m, reorder = FALSE, reorder.by = NULL, groups = NULL, interorder = TRUE,
-                        genome = "hg38", dist.method = "euclidean", cluster.method = "complete") {
+# prepare the data to plot cna heatmap
+# m --> a cna matrix
+# reorder --> whether the cells
+# reorder.by --> reorder cells by genes on select chromosomes or chromosome arms, e.g., c("7", "10", "1p", "19q"). Default: NULL
+# groups --> groups of cells to delineate and label on the plot (e.g., cell types, samples, or subclones). If <reorder> is TRUE, ordering will be performed within groups, Default: NULL
+# interorder --> reorder by hierarchical clustering between groups, Default: TRUE
+# genome --> set genome to use ('hg19' or 'hg38'), Default: 'hg19'
+# dist.method --> distance metric for reordering, Default: 'euclidean'
+# cluster.method --> linkage method for reordering, Default: 'complete'
+
+.ggcna_prep <- function(m,
+                        reorder = FALSE,
+                        reorder.by = NULL,
+                        groups = NULL,
+                        interorder = TRUE,
+                        genome = "hg19",
+                        dist.method = "euclidean",
+                        cluster.method = "complete") {
   if (!reorder) {
     return(m)
   }
@@ -27,8 +43,6 @@
   m[, cols]
 }
 
-
-## re change the value of vector
 .limit <- function(v) {
   m <- 10
   Sign <- sign(v)
@@ -37,9 +51,8 @@
   return(v.lim)
 }
 
-
 .limits <- function(v, symmetric = TRUE) {
-  stopifnot(length(v) == 2, all(sapply(v, class) == "numeric"))
+  stopifnot(length(v) == 2, all(sapply(v, class) == 'numeric'))
 
   if (!symmetric) {
     return(sapply(v, .limit))
@@ -63,6 +76,7 @@
   return(list(breaks = breaks, labels = labels))
 }
 
+# get from ggpubr::rotate_x_text
 rotate_x_text <- function(angle = 90, hjust = NULL, vjust = NULL, ...) {
   if (missing(hjust) & angle > 5)
     hjust <- 1
@@ -71,277 +85,340 @@ rotate_x_text <- function(angle = 90, hjust = NULL, vjust = NULL, ...) {
   theme(axis.text.x = element_text(angle = angle, hjust = hjust, vjust = vjust, ...))
 }
 
+# get from ggpubr::rotate_y_text
+rotate_y_text <- function (angle = 90, hjust = NULL, vjust = NULL, ...) {
+  if (missing(hjust) & angle == 90)
+    hjust <- 0.5
+  else if (missing(hjust) & angle > 5)
+    hjust <- 1
+  theme(axis.text.y = element_text(angle = angle, hjust = hjust,
+                                   vjust = vjust, ...))
+}
+
+
+#' @title Plot A Heatmap with ggplot2
 #'
-#' Plot A Heatmap with ggplot2
-#'
-#'
+#' @description
 #' `ggheatmap()` create a heatmap ggplot2 object.
-#'
 #'
 #' @param dat A \code{data.frame} or a \code{tibble} to plot ggplot.
 #' @param x The column name of variable mapping to x axis.
 #' @param y The column name of variable mapping to y axis.
 #' @param fill The column name of variable mapping to heatmap fill.
-#' @param limits A vector to set the max and min value to plot heatmap.
-#' @param raster.labels Whether label the value in heatmap. Defualt: 45.
-#' @param raster.label.col The color of raster.labels in heatmap. Default: black.
-#' @param lim.find If you want to auto set limit, set this argument as TRUE.
-#' @param lim.sym Set with \code{lim.find}, whether use the same upper or lower threshold
-#' @param title Heatmap title.
-#' @param subtitle Heatmap subtitle.
-#' @param caption Heatmap caption title.
-#' @param x.name The x axis name.
+#' @param x.num description
+#' @param y.num description
+#' @param limits A vector to set the min and max value to plot heatmap. Default: -1, 1
+#' @param limits.find If used, auto find the value limits to plot heatmap. Default: FALSE
+#' @param limits.symmetric Used with \code{limits.find}. If used, set the value limits to be symmetrical. Default: FALSE
+#' @param cols a color vector used to plot heatmap. If NULL, automatically set built-in palettes. Default: NULL
+#' @param na.value The colot of NA value.
+#' @param raster.labels Whether label the value in heatmap. Default: FALSE
+#' @param raster.labels.col The color of the label in heatmap
+#' @param x.breaks,y.breaks same as \code{breaks} in \code{\link[ggplot2]{scale_x_continuous}} or \code{\link[ggplot2]{scale_y_continuous}}
+#' @param x.labels,y.labels same as \code{labels} in \code{\link[ggplot2]{scale_x_continuous}} or \code{\link[ggplot2]{scale_y_continuous}}
+#' @param labels.col The color of x axis and y axis label
+#' @param x.labels.angle,y.labels.angle The Angle of x axis or y axis label (in \eqn{[0, 360]})
+#' @param x.expand,y.expand same as \code{expand} in \code{\link[ggplot2]{scale_x_continuous}} or \code{\link[ggplot2]{scale_y_continuous}}
+#' @param x.position,y.position same as \code{position} in \code{\link[ggplot2]{scale_x_continuous}} or \code{\link[ggplot2]{scale_y_continuous}}
+#' @param x.title,y.title The title of x axis or y axis
+#' @param legend.breaks same as \code{breaks} in \code{\link[ggplot2]{scale_fill_gradientn}}
+#' @param legend.labels same as \code{labels} in \code{\link[ggplot2]{scale_fill_gradientn}}
+#' @param legend.labels.col The legend label color
+#' @param legend.width same as \code{legend.width} in \code{\link[ggplot2]{theme}}
+#' @param legend.height same as \code{legend.height} in \code{\link[ggplot2]{theme}}
+#' @param legend.margin same as \code{legend.margin} in \code{\link[ggplot2]{theme}}
+#' @param legend.title The name of legend
+#' @param legend.position same as \code{legend.position} in \code{\link[ggplot2]{theme}}
+#' @param legend.justification same as \code{legend.justification} in \code{\link[ggplot2]{theme}}
+#' @param title same as \code{title} in \code{\link[ggplot2]{labs}}
+#' @param subtitle same as \code{subtitle} in \code{\link[ggplot2]{labs}}
+#' @param caption same as \code{caption} in \code{\link[ggplot2]{labs}}
+#' @param text.size The base size of text in the plot
+#' @param plot.margin same as \code{plot.margin} in \code{\link[ggplot2]{theme}}
 #'
-#' @param y.name The y axis name.
+#' @return return a ggplot2 object
 #'
-#' @param x.angle The angle to change of x axis text. Default: TRUE
+#' @export
+#' @rdname cnaplot
 #'
-#' @param axis.rel The relative size of axis name. Default: 1
+#' @import ggplot2
 #'
-#' @param title.rel The relative size of title name. Default: 1.1
-#'
-#' @param text.size base font size, given in pts.
-#'
-#' @param aspect.ratio aspect ratio of the panel
-#'
-#' @param cols a vector of color to use in heatmap
-#'
-#' @param na.value Colour to use for missing values
-#'
-#' @param plot.margin margin around entire plot \code{unit} with the sizes of the `top`, `right`, `bottom`, and `left` margins
-#'
-#' @param legend.position the default position of legends `none`, `left`, `right`, `bottom`, `top`, `inside`
-#'
-#' @param legend.justification anchor point for positioning legend inside plot `center` or two-element numeric vector or the justification according to the plot area when positioned outside the plot
-#'
-#' @param legend.margin the margin around each legend \code{\link[ggplot2]{element}}
-#'
-#' @param legend.title The legend title name
-#'
-#' @param legend.title.position placement of legend title relative to the main legend. `top`, `right`, `bottom` or `left`.
-#'
-#' @param legend.title.rel The relative size of legend title. Default: 0.8
-#'
-#' @param legend.key.height,legend.key.width size of legend keys \code{unit}
-#'
-#' @param legend.text.rel The relative size of legend text. Default: 0.8
-#'
-#' @param legend.text.color The color of legend text. Default: black
-#'
-#' @param legend.breaks The breaks of legend. One of:
-#'
-#' - NULL for no breaks
-#'
-#' - \code{waiver()} for the default breaks computed by the \code{\link[scales]{new_transform}}
-#'
-#' - A numeric vector of positions
-#'
-#' - A function that takes the limits as input and returns breaks as output e.g., a function returned by \code{\link[scales]{extended_breaks}}. Note that for position scales, limits are provided after scale expansion. Also accepts rlang \code{\link[rlang]{as_function}} function notation.
-#'
-#'  @param legend.labels The labels of legend. One of:
-#'
-#' - NULL for no labels
-#'
-#' - \code{waiver()} for the default labels computed by the transformation object
-#'
-#' - A character vector giving labels, must be same length as \code{breaks}
-#'
-#' - An expression vector, must be the same length as breaks. See ?plotmath for details.
-#'
-#' - A function that takes the breaks as input and returns labels as output. Also accepts rlang \code{\link[rlang]{as_function}} function notation.
-#'
-#' @param ticks.linewidth The ticks width. Default: 0.5
-#' @param x.axis.position,y.axis.position For position scales, The position of the axis. `top` or `bottom` for x axes, \code{left} or \code{right} for y axes.
-#'
-#' @param breaks,x.breaks,y.breaks The breaks of x axis or y axis. If you set \code{breaks}, it will be use in \code{x.breaks} and \code{y.breaks}. Or you set them separately. One of:
-#'
-#' - NULL for no breaks.
-#'
-#' - \code{waiver()} for the default breaks computed by the \code{\link[scales]{new_transform}}
-#'
-#' - A numeric vector of positions
-#'
-#' - A function that takes the limits as input and returns breaks as output e.g., a function returned by \code{\link[scales]{extended_breaks}}. Note that for position scales, limits are provided after scale expansion. Also accepts rlang \code{\link[rlang]{as_function}} function notation.
-#'
-#' @param labels,x.labels,y.labels The labels of x axis or y axis. If you set \code{breaks}, it will be use in \code{x.breaks} and \code{y.breaks}. Or you set them separately. One of:
-#'
-#' - NULL for no breaks
-#'
-#' - \code{waiver()} for the default labels computed by the \code{\link[scales]{new_transform}}
-#'
-#' - A character vector giving labels, must be same length as \code{breaks}
-#'
-#' - An expression vector, must be the same length as breaks. See ?plotmath for details.
-#'
-#' - A function that takes the breaks as input and returns labels as output. Also accepts rlang \code{\link[rlang]{as_function}} function notation.
-#'
-#' @param num,x.num,y.num Whether the set x axis or y axis as numeric, if you set \code{num}, it will be use in \code{x.num} and \code{y.num}. Or you set them separately. Default: TRUE
-#'
-#' @param expand For position scales, a vector of range expansion constants used to add some padding around the data to ensure that they are placed some distance away from the axes.
-#' Use the convenience function \code{expansion()} to generate the values for the expand argument. The defaults are to expand the scale by 5\% on each side for continuous variables,
-#' and by 0.6 units on each side for discrete variables.
-#'
-#' @importFrom rlang enquo quo_name :=
-#' @importFrom scales squish
-#' @importFrom ggplot2 aes waiver
-#'
-#' @return return a ggplot object
-#'
-ggheatmap <- function(dat, x = Var1, y = Var2, fill = value, limits = c(-0.5, 0.5),
+ggheatmap <- function(dat,
+                      x = Var1,
+                      y = Var2,
+                      fill = value,
+                      x.num = TRUE,
+                      y.num = TRUE,
+                      limits = c(-1, 1),
+                      limits.find = FALSE,
+                      limits.symmetric = FALSE,
+                      cols = NULL, na.value = NULL,
                       raster.labels = FALSE,
-                      raster.label.col = "black",
-                      lim.find = F, lim.sym = T,
-                      title = waiver(), subtitle = waiver(), caption = waiver(),
-                      x.name = NULL, y.name = NULL, x.angle = 45,
-                      axis.rel = 1, title.rel = 1.1, text.size = 12,
-                      aspect.ratio = NULL,
-                      cols = NULL, na.value = "white",
-                      plot.margin = margin(0, 0.15, 0, 0, "cm"),
-                      legend.position = "bottom",
-                      legend.justification = "right",
-                      legend.margin = margin(0, 0.15, 0, 0, "cm"),
-                      legend.title = NULL,
-                      legend.title.position = "top",
-                      legend.title.rel = 0.8,
-                      legend.key.height = grid::unit(0.4, "cm"),
-                      legend.key.width = grid::unit(0.6, "cm"),
-                      legend.text.rel = 0.8,
-                      legend.text.color = "black",
-                      legend.breaks = NULL,
-                      legend.labels = NULL,
-                      ticks.linewidth = 0.5,
-                      x.axis.position = "bottom",
-                      y.axis.position = "left",
-                      breaks = waiver(),
+                      raster.labels.col = 'black',
                       x.breaks = waiver(),
                       y.breaks = waiver(),
-                      labels = waiver(),
                       x.labels = waiver(),
                       y.labels = waiver(),
-                      num = T,
-                      y.num = num,
-                      x.num = num,
-                      expand = c(0, 0)) {
-  ## get x y
-  x <- enquo(x)
-  y <- enquo(y)
-  fill <- enquo(fill)
-  xname <- quo_name(x)
-  yname <- quo_name(y)
+                      labels.col = 'black',
+                      x.labels.angle = 0,
+                      y.labels.angle = 0,
+                      x.expand = c(0, 0),
+                      y.expand = c(0, 0),
+                      x.position = 'bottom',
+                      y.position = 'left',
+                      x.title = NULL,
+                      y.title = NULL,
+                      legend.breaks = NULL,
+                      legend.labels = NULL,
+                      legend.labels.col = 'black',
+                      legend.width = unit(0.3, 'cm'),
+                      legend.height = unit(0.8, 'cm'),
+                      legend.margin = ggplot2::margin(t = -0.02, unit='npc'),
+                      legend.title = 'Scaled Expression',
+                      legend.position = 'bottom',
+                      legend.justification = 'right',
+                      title = waiver(),
+                      subtitle = waiver(),
+                      caption = waiver(),
+                      text.size = 12,
+                      plot.margin = ggplot2::margin(0.15, 0.15, 0.15, 0.15,'cm')
+                      ) {
+  x <- rlang::enquo(x)
+  y <- rlang::enquo(y)
+  fill <- rlang::enquo(fill)
+  xname <- rlang::quo_name(x)
+  yname <- rlang::quo_name(y)
 
-  if (!inherits(breaks, "waiver")) {
-    x.breaks <- breaks
-    y.breaks <- breaks
-  }
+  ## axis breaks and labels
+  if (class(x.breaks) != 'waiver') x.breaks <- x.breaks
+  if (class(x.labels) != 'waiver') x.labels <- x.labels
+  if (class(y.breaks) != 'waiver') y.breaks <- y.breaks
+  if (class(y.labels) != 'waiver') y.labels <- y.labels
 
-  if (!inherits(labels, "waiver")) {
-    x.labels <- labels
-    y.labels <- labels
-  }
 
-  ## set scale
-  if (x.num | num | inherits(dat %>% dplyr::pull(!!x), "numeric")) {
+  if (x.num | class(dat %>% dplyr::pull(!!x)) == 'numeric') {
     dat <- dat %>% dplyr::mutate(!!xname := as.numeric(!!x))
     x.scale.FUN <- ggplot2::scale_x_continuous
   } else {
     x.scale.FUN <- ggplot2::scale_x_discrete
   }
-  if (y.num | num | inherits(dat %>% dplyr::pull(!!y), "numeric")) {
+
+  if (y.num | class(dat %>% dplyr::pull(!!y)) == 'numeric') {
     dat <- dat %>% dplyr::mutate(!!yname := as.numeric(!!y))
     y.scale.FUN <- ggplot2::scale_y_continuous
   } else {
     y.scale.FUN <- ggplot2::scale_y_discrete
   }
-  x.scale <- quote(x.scale.FUN(
-    expand = expand,
-    breaks = x.breaks,
-    labels = x.labels,
-    position = x.axis.position
-  ))
-  y.scale <- quote(y.scale.FUN(
-    expand = expand,
-    breaks = y.breaks,
-    labels = y.labels,
-    position = y.axis.position
-  ))
 
-  ## label value
-  if (isTRUE(raster.labels)) {
+  ## show number
+  if (is_true(raster.labels)) {
     dat <- dat %>% dplyr::mutate(label = round(!!fill, 1))
-  } else if (!is.null(raster.labels) & length(raster.labels) == nrow(dat)) {
+  } else if (!is_null(raster.labels) & length(raster.labels) == nrow(dat)) {
     dat$label <- raster.labels
   }
-
-  ## set value limit
-  if (lim.find) {
-    v <- dat %>%
-      dplyr::select(!!fill) %>%
-      range()
-    limits <- .limits(v = v, symmetric = lim.sym)
+  ## set limit
+  if (limits.find) {
+    v <- dat %>% dplyr::select(!!fill) %>% range
+    limits <- .limits(v = v, symmetric = limits.symmetric)
   }
 
-  ## set color
-  if (is.null(cols) & limits[[1]] >= 0) {
-    cols <- c("#FFFFCC", "#FFEDA0", "#FED976", "#FEB24C", "#FD8D3C",
-              "#FC4E2A","#E31A1C", "#BD0026", "#800026")
-  } else if (is.null(cols)) {
-    cols <- c("#053061", "#2166ac", "#4393c3", "#92c5de", "#d1e5f0", "#f7f7f7",
-              "#fddbc7", "#f4a582", "#d6604d", "#b2182b", "#67001f")
+  ## set color palettes
+  if (is_null(cols) & limits[[1]] >= 0) {
+    cols <- RColorBrewer::brewer.pal(9, 'YlOrRd')
+  } else if (is_null(cols)) {
+    cols <- c("#053061", "#2166ac", "#4393c3", "#92c5de", "#d1e5f0",
+              "#f7f7f7", "#fddbc7", "#f4a582", "#d6604d", "#b2182b", "#67001f")
   }
 
-
+  ## set legend breaks
   legend <- .axis.spacer(breaks = legend.breaks, labels = legend.labels, limits = limits)
   legend.breaks <- legend$breaks
   legend.labels <- legend$labels
 
   ## plot heatmap
-  G <- ggplot2::ggplot(dat, aes(x = !!x, y = !!y, fill = !!fill, group = 1)) +
-    ggplot2::geom_raster() +
-    ggplot2::scale_fill_gradientn(
-      colors = cols,
-      limits = limits,
-      expand = expand,
-      oob = squish,
-      breaks = legend.breaks,
-      labels = legend.breaks,
-      name = legend.title,
-      na.value = na.value,
-      guide = ggplot2::guide_colorbar(
-        frame.colour = "black",
-        ticks.colour = "black",
-        title.position = "top",
-        title.hjust = 0.5,
-        barwidth = 3,
-        barheight = 0.75
-      )
-    ) +
-    eval(x.scale) +
-    eval(y.scale) +
-    ggplot2::labs(x = x.name, y = y.name, title = title, subtitle = subtitle, caption = caption) +
-    ggplot2::theme_bw(base_size = text.size) +
-    rotate_x_text(angle = x.angle, vjust = 1)
-  ggplot2::theme(
-    aspect.ratio = aspect.ratio,
-    title = ggplot2::element_text(size = ggplot2::rel(title.rel)),
-    axis.title = ggplot2::element_text(size = ggplot2::rel(axis.rel)),
-    legend.position = legend.position,
-    legend.justification = legend.justification,
-    legend.text = ggplot2::element_text(size = ggplot2::rel(legend.text.rel), color = legend.text.color, hjust = 0.5),
-    legend.title = ggplot2::element_text(size = ggplot2::rel(legend.title.rel)),
-    legend.margin = ggplot2::margin(t = -0.5, unit = "cm"),
-    plot.margin = plot.margin,
-    legend.key.height = legend.key.height,
-    legend.key.width = legend.key.width
-  )
+  p <- ggplot(data = dat, aes(x = !!x, y = !!y, fill = !!fill, group = 1)) +
+    geom_raster() +
+    scale_fill_gradientn(colors = cols,
+                         limits = limits,
+                         oob = scales::squish,
+                         breaks = legend.breaks,
+                         labels = legend.breaks,
+                         name = legend.title,
+                         na.value = na.value,
+                         guide = ggplot2::guide_colorbar(frame.colour = 'black', ticks.colour='black',
+                                                         title.position = 'top', title.hjust = 0.5)
+                         ) +
+    eval(quote(x.scale.FUN(breaks = x.breaks, labels = x.labels, expand = x.expand, position = x.position))) +
+    eval(quote(y.scale.FUN(breaks = y.breaks, labels = y.labels, expand = y.expand, position = y.position)))
 
-
+  ## add raster label
   if ("label" %in% colnames(dat)) {
-    G <- G +
-      ggplot2::geom_text(aes(label = label), colour = raster.label.col)
+    p <-  p + ggplot2::geom_text(aes(label = label), colour = raster.labels.col)
   }
 
-  return(G)
+  p <- p + labs(x = x.title, y = y.title, title = title, subtitle = subtitle, caption = caption) +
+    theme_bw(base_size = text.size) +
+    ## set axis text angle
+    rotate_x_text(angle = x.labels.angle) +
+    rotate_y_text(angle = y.labels.angle) +
+    theme(axis.text = element_text(color = labels.col),
+          legend.position = legend.position,
+          legend.justification = legend.justification,
+          legend.text = ggplot2::element_text(colour = legend.labels.col),
+          legend.margin = legend.margin,
+          legend.key.height = legend.height,
+          legend.key.width = legend.width,
+          plot.margin = plot.margin)
+
+  return(p)
 }
+
+
+
+
+#' @title plot a CNA heatmap
+#' @description
+#' Uses `ggplot::geom_raster` to generate a plot of copy number aberration (CNA) values. Delineates chromosomes and chromosome arms, and provides options for clustering cells or groups of cells (e.g., cell types, samples, or subclones) prior to plotting.
+#'
+#' @param cna CNA matrix (genes by cells). It can be generated using \code{\link[Infercna]{Infercna}}.
+#' @param genome The genome annotation to order the genes.
+#' @param reorder reorder cells using hierarchical clustering, Default: FALSE
+#' @param reorder.by reorder cells by genes on select chromosomes or chromosome arms, e.g., c("7", "10", "1p", "19q"). Default: NULL
+#' @param groups groups of cells to delineate and label on the plot (e.g., cell types, samples, or subclones). If <reorder> is TRUE, ordering will be performed within groups, Default: NULL
+#' @param interorder reorder by hierarchical clustering betweeen groups, Default: TRUE
+#' @param dist.method distance metric for reordering, Default: 'euclidean'
+#' @param cluster.method linkage method for reordering, Default: 'complete'
+#' @param hide hide x-axis labels for specific chromosomes (e.g., small chromosomes whose labels would overlap flanking labels), Default: c("21", "Y")
+#' @param limits for the color key; replaces out of bounds values with the nearest limit. Default: c(-1, 1)
+#' @param cols custom color palette (character vector), Default: NULL
+#' @param legend.title legend title, Default: NULL
+#' @param title plot title, Default: 'Copy-number aberrations'
+#' @param ... Other argument used in \code{\link[Infercna]{ggheatmap}}
+#'
+#' @return return a ggplot object
+#'
+#' @export
+#' @rdname cnaplot
+#'
+#'
+cnaplot <- function(cna,
+                    genome = 'hg19',
+                    reorder = FALSE,
+                    reorder.by = NULL,
+                    groups = NULL,
+                    interorder = TRUE,
+                    dist.method = 'euclidean',
+                    cluster.method = 'complete',
+                    hide = c('21','Y'),
+                    limits = c(-1, 1),
+                    cols = NULL,
+                    legend.title = 'Scaled CNA values',
+                    title = 'Copy-number aberrations',
+                    ...
+                    ) {
+  if (is_null(cols)) {
+    cols <- c(
+      "#053061", "#2166AC", "#4393C3", "#92C5DE", "#D1E5F0", "#F7F7F7",
+      "white", "#F7F7F7", "#FDDBC7", "#F4A582", "#D6604D", "#B2182B", "#67001F")
+  }
+
+  ## set geom vlines,breaks,labels for chr and chr arms
+  chr.size <-  0.1
+  arm.size <- 0.05
+  genes <- rownames(cna)
+  useGenome(genome)
+  m <- orderGenes(cna)
+  L <- splitGenes(genes)
+  xints <- cumsum(lengths(L)) + chr.size
+  L2 <- splitGenes(genes, by = 'arm')
+  xints2 <- cumsum(lengths(L2)) + arm.size
+  xints2 <- xints2[str_detect(names(xints2), "p")]
+  x.breaks <- (xints - chr.size) - lengths(L)/2
+  x.labels <- names(xints)
+  x.labels[names(xints) %in% hide] <- ''
+
+  m <- .ggcna_prep(m,
+                   reorder = reorder,
+                   reorder.by = reorder.by,
+                   groups = groups,
+                   genome = genome,
+                   interorder = interorder,
+                   dist.method = dist.method,
+                   cluster.method = cluster.method)
+  if (!is_null(groups)) {
+    line.size <- 0.1
+    ord <- colnames(m)
+    groupNames <- flip(Unlist(groups))[ord]
+    groupNames <- groupNames[!duplicated(groupNames)]
+    yints <- cumsum(lengths(groups)) + line.size
+    y.breaks <- (yints-line.size) - lengths(groups)/2
+    y.labels <- names(yints)
+  } else {
+    y.labels <- ggplot2::waiver()
+    y.breaks <- ggplot2::waiver()
+  }
+
+  d <- reshape2::melt(as.matrix(m)) %>%
+    dplyr::mutate(Var1 = as.numeric(factor(as.character(Var1), levels = rownames(m))),
+                  Var2 = as.numeric(factor(as.character(Var2), levels = colnames(m))))
+
+  p <- ggheatmap(d, x = Var1, y = Var2, fill = value, title = title,
+                 limits = limits, legend.title = legend.title, cols = cols,
+                 x.breaks = x.breaks, x.labels = x.labels,
+                 y.breaks = y.breaks, y.labels = y.labels,
+                 ...) +
+    geom_vline(xintercept = xints, color = 'grey20', linetype = 1, linewidth = chr.size) +
+    geom_vline(xintercept = xints2, color = 'grey20', linetype = 2, linewidth = arm.size) +
+    # scalop::theme_scalop(legend.text.size = 14) +
+    ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5, size = 16),
+                   axis.ticks.x = ggplot2::element_blank())
+  return(p)
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -374,12 +451,12 @@ ggheatmap <- function(dat, x = Var1, y = Var2, fill = value, limits = c(-0.5, 0.
 #' @return a `ggplot` object
 #' @examples
 #' \dontrun{
-#' m <- Infercna(mgh125, isLog = TRUE, refCells = refCells)
+#' m <- Infercna(mgh125, refCells = refCells)
 #' malCells <- list(Malignant = setdiff(colnames(mgh125), unlist(refCells)))
 #' groups <- c(malCells, refCells)
-#' p <- ggcna(m, reorder = T, groups = refCells)
+#' p <- cnaplot(m, reorder = T, groups = refCells)
 #' }
-#' @rdname ggcna
+#' @rdname cnaplot
 #' @export
 cnaplot <- function(m, reorder = FALSE, reorder.by = NULL, groups = NULL, interorder = TRUE,
                     genome = "hg19", dist.method = "euclidean", cluster.method = "complete",

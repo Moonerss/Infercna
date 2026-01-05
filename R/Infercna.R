@@ -22,6 +22,7 @@
 
 #' @title Infer Copy-Number Alterations From Single-Cell RNA-Seq Data
 #' @description Infer Copy-Number Alterations From Single-Cell RNA-Seq Data
+#'
 #' @param expr_mat a normalized expression matrix of genes X cells containing scRNA-seq expression data. It can be TPM, RPKM, CPM etc.
 #' @param refCells a list of two or more character vectors, each containg cell IDs of normal cell types (one cell type per list element). Since these cell types are presumed normal cells, their CNA values can be used to correct the remaining CNA values. Note that all cell IDs should correspond to column names in expr_mat. See Infercna::refCells (normal cells) for an example. Default: NULL
 #' @param window the size of the window to use for the rolling mean. Units are in number of genes. Default: 100

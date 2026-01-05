@@ -121,32 +121,32 @@ hca_reorder <- function(x,
 #' @return reordered matrix (same dimensions as input) or a character vector of ordered column names if Names = T.
 #' @rdname grouped_reorder
 #' @export
-grouped_reorder = function(m,
-                           groups,
-                           interorder = FALSE,
-                           intraorder = TRUE,
-                           cor.method = 'pearson',
-                           dist.method = 'euclidean',
-                           cluster.method = 'average',
-                           Names = FALSE) {
+grouped_reorder <- function(m,
+                            groups,
+                            interorder = FALSE,
+                            intraorder = TRUE,
+                            cor.method = 'pearson',
+                            dist.method = 'euclidean',
+                            cluster.method = 'average',
+                            Names = FALSE) {
 
   if (interorder) {
-    groupAvgs = sapply(groups, function(group) rowMeans(m[, group, drop = F]))
-    groups = groups[hca_order(rowcenter(groupAvgs))]
+    groupAvgs <- sapply(groups, function(group) rowMeans(m[, group, drop = F]))
+    groups <- groups[hca_order(rowcenter(groupAvgs))]
   }
 
   if (intraorder) {
-    m.list = sapply(groups, function(x) m[, x], simplify = F)
-    groups = sapply(m.list, function(m) hca_order(rowcenter(m),
-                                                  cor.method = cor.method,
-                                                  dist.method = dist.method,
-                                                  cluster.method = cluster.method))
+    m.list <- sapply(groups, function(x) m[, x], simplify = F)
+    groups <- sapply(m.list, function(m) hca_order(rowcenter(m),
+                                                   cor.method = cor.method,
+                                                   dist.method = dist.method,
+                                                   cluster.method = cluster.method))
   }
 
   if (Names) {
     return(groups)
   }
 
-  ord = as.character(unlist(groups, use.names = F))
+  ord <- as.character(unlist(groups, use.names = F))
   m[, ord]
 }

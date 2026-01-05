@@ -25,6 +25,7 @@ Imports:
     magrittr,
     Matrix,
     matrixStats,
+    nor1mix,
     rlang,
     scales,
     stringr,

@@ -1,5 +1,5 @@
 .geneMatch <- function(genes) {
-  match(Genv$gene, genes, nomatch = 0)
+  match(Genv$gene %>% unique(), genes, nomatch = 0)
 }
 
 #' @title Order Genes by their Genomic Positions
@@ -17,7 +17,7 @@
 #' @rdname orderGenes
 #' @export
 orderGenes <- function(x) {
-  if (is.null(dim(x))) {
+  if (is_null(dim(x))) {
     return(x[.geneMatch(genes = x)])
   }
   x[.geneMatch(rownames(x)), , drop = FALSE]

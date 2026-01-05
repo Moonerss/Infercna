@@ -109,6 +109,7 @@ clip <- function(m, range = c(-3, 3)) {
 #' @rdname Unlist
 #' @export
 #' @importFrom stats setNames
+#'
 Unlist <- function(L, nested.names = FALSE) {
   if (nested.names) {
     Names <- unlist(sapply(L, names), use.names = F)
