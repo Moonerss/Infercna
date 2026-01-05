@@ -41,6 +41,7 @@ cnaHotspotGenes <- function(cna, gene.quantile = NULL, cell.quantile = NULL) {
 }
 
 
+#'
 #' @title Calculate the Means of Squared CNA Values
 #' @description Calculate the Mean of Squared CNA Values
 #'

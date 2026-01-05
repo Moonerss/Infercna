@@ -33,6 +33,7 @@
   cellcors
 }
 
+#'
 #' @title Cell - Tumour CNA Correlations
 #' @description Compute the pairwise correlations between individual cells' CNA values and the average CNA values in their tumour of origin.
 #'
