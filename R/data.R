@@ -47,7 +47,7 @@
 
 #' scRNA-seq data from a patient with Glioblastoma
 #'
-#' A single-cell RNA-sequencing dataset containing 8556 HQ genes and 1265 high quality cells. The data was generated using the Smart-Seq2 protocol and was analysed in the form log2(TPM/10 + 1).
+#' A single-cell RNA-sequencing dataset containing 8556 HQ genes and 1265 high quality cells. The data was generated using the Smart-Seq2 protocol and was analysed in the form TPM.
 #'
 #' @format A matrix with 8556 genes (rows) and 1265 cells (columns):
 #' @import Matrix
@@ -56,7 +56,7 @@
 
 #' scRNA-seq data from a patient with Glioblastoma
 #'
-#' A single-cell RNA-sequencing dataset containing 8556 HQ genes and 1266 high quality cells. The data was generated using the Smart-Seq2 protocol and was analysed in the form log2(TPM/10 + 1).
+#' A single-cell RNA-sequencing dataset containing 8556 HQ genes and 1266 high quality cells. The data was generated using the Smart-Seq2 protocol and was analysed in the form TPM.
 #'
 #' @format A matrix with 8556 genes (rows) and 1266 cells (columns):
 #' @import Matrix
