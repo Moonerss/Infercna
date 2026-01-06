@@ -2,6 +2,7 @@
 ^renv\.lock$
 ^.*\.Rproj$
 ^\.Rproj\.user$
+^\.Renviron$
 ^data-raw$
 ^LICENSE\.md$
 ^_pkgdown\.yml$
