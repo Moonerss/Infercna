@@ -7,8 +7,9 @@
 #' @param prob a numeric value >= 0 and <= 1; the minimum posterior probability required for an observation to be assigned to a mode. Default: 0.95
 #' @param coverage the fraction of observations that must have a posterior probability higher than <prob> to one of two modes in order for the distribution to qualify as bimodal. Default: 0.8
 #' @param size the minimum number of observations required to define a mode. Default: 10
-#' @param by found clones by different gene position, Default: 'chr'
-#' @param name description
+#' @param by found clones by different gene position, Default: \code{chr}
+#' @param minGenes The min number of genes to found clones.
+#' @param bySampling,nsamp,... see \code{\link[Infercna]{fitBimodal}}
 #'
 #' @return return a list of all small clone
 #' @export
@@ -18,9 +19,9 @@ fetchModes <- function(cna,
                        coverage = 0.8,
                        size = 10,
                        by = 'chr',
+                       minGenes = 50,
                        bySampling = FALSE,
                        nsamp = 2000,
-                       minGenes = 50,
                        ...) {
 
   mats <- splitGenes(cna, by = by)

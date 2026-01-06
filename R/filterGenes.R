@@ -39,9 +39,6 @@ filterGenes <- function(x, value, attribute, out = F) {
 #'
 #' @return a character vector of gene names
 #'
-#' @examples
-#' genesOn(7, 'chr')
-#'
 #' @rdname genesOn
 #' @export
 #'
