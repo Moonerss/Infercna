@@ -18,17 +18,18 @@
 #'
 cnaScatterPlot <- function(cna,
                            cor.method = 'pearson',
-                           gene.quantile = NULL,
+                           gene.quantile.for.cor = 0.5,
+                           gene.quantile.for.signal = 0.9,
                            refCells = NULL,
                            samples = NULL,
                            verbose = FALSE
                            ) {
 
   if (verbose) cli::cli_alert_info('Calculate cna correlation')
-  cna_cor <- cnaCor(cna, gene.quantile = gene.quantile, refCells = refCells, samples = samples)
+  cna_cor <- cnaCor(cna, gene.quantile = gene.quantile.for.cor, refCells = refCells, samples = samples)
 
   if (verbose) cli::cli_alert_info('Calculate cna score')
-  cna_score <- cnaSignal(cna, gene.quantile = gene.quantile, refCells = refCells, samples = samples)
+  cna_score <- cnaSignal(cna, gene.quantile = gene.quantile.for.signal, refCells = refCells, samples = samples)
 
   plot_data <- data.frame(cna_cor = cna_cor, cna_score = cna_score)
 
