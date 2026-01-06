@@ -20,8 +20,9 @@
 #' The first of these is CNA correlation \code{\link[Infercna]{cnaCor}}, which measures the pearson correlations between individual cells' CNA profiles and the average profile of their tumours of origin.
 #' The second measure is CNA signal \code{\link[Infercna]{cnaSignal}}, which computes the cell averages of squared CNA values. The function then assigns cells residing in the 2nd (higher-value) mode by both measures as malignant, cells residing in the 1st (low-value) mode by both measures as non-malignant, and any remaining cells with conflicting assignments to modes as unassigned.
 #'
-#' @rdname findMalignant
+#' @importFrom utils capture.output
 #'
+#' @rdname findMalignant
 #' @export
 #'
 findMalignant <- function(cna,
@@ -47,7 +48,6 @@ findMalignant <- function(cna,
     cli::cli_alert_info('Fitting CNA correlations to one of two (CNA-low vs. CNA-high) modes...')
   }
 
-  old <- Sys.time()
   invisible(capture.output(corGroups <- suppressMessages(fitBimodal(cna_cor,
                                                                     bySampling = use.bootstraps,
                                                                     nsamp = n.bootstraps,
@@ -55,36 +55,23 @@ findMalignant <- function(cna,
                                                                     coverage = coverage,
                                                                     assign = TRUE,
                                                                     ...))))
-  new <- Sys.time()
   if (isFALSE(corGroups)) return(FALSE)
 
   if (verbose) {
-    timerun = scalop::hms_span(start = old, end = new)
-    message('(completed in ', timerun, 's)')
+    cli::cli_alert_info('Fitting CNA signals to one of two (CNA-low vs. CNA-high) modes...')
   }
 
-  if (verbose) {
-    message('Fitting CNA signals to one of two (CNA-low vs. CNA-high) modes...')
-  }
-
-  old <- Sys.time()
-  invisible(capture.output(sigGroups <- suppressMessages(fitBimodal(signals,
+  invisible(capture.output(sigGroups <- suppressMessages(fitBimodal(cna_score,
                                                                     bySampling = use.bootstraps,
                                                                     nsamp = n.bootstraps,
                                                                     prob = prob,
                                                                     coverage = coverage,
                                                                     assign = TRUE,
                                                                     ...))))
-  new <- Sys.time()
   if (isFALSE(sigGroups)) return(FALSE)
 
   if (verbose) {
-    timerun = scalop::hms_span(start = old, end = new)
-    message('(completed in ', timerun, 's)')
-  }
-
-  if (verbose) {
-    message('Identifying cells classified as CNA-high by both parameters...')
+    cli::cli_alert_info('Identifying cells classified as CNA-high by both parameters...')
   }
 
   sect <- comply(corGroups, sigGroups, FUN = intersect)

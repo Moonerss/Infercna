@@ -142,6 +142,7 @@ rotate_y_text <- function (angle = 90, hjust = NULL, vjust = NULL, ...) {
 #' @rdname cnaplot
 #'
 #' @import ggplot2
+#' @importFrom rlang :=
 #'
 ggheatmap <- function(dat,
                       x = Var1,
@@ -190,20 +191,20 @@ ggheatmap <- function(dat,
   yname <- rlang::quo_name(y)
 
   ## axis breaks and labels
-  if (class(x.breaks) != 'waiver') x.breaks <- x.breaks
-  if (class(x.labels) != 'waiver') x.labels <- x.labels
-  if (class(y.breaks) != 'waiver') y.breaks <- y.breaks
-  if (class(y.labels) != 'waiver') y.labels <- y.labels
+  if (inherits(x.breaks, 'waiver')) x.breaks <- x.breaks
+  if (inherits(x.labels, 'waiver')) x.labels <- x.labels
+  if (inherits(y.breaks, 'waiver')) y.breaks <- y.breaks
+  if (inherits(y.labels, 'waiver')) y.labels <- y.labels
 
 
-  if (x.num | class(dat %>% dplyr::pull(!!x)) == 'numeric') {
+  if (x.num | inherits(dat %>% dplyr::pull(!!x), 'numeric')) {
     dat <- dat %>% dplyr::mutate(!!xname := as.numeric(!!x))
     x.scale.FUN <- ggplot2::scale_x_continuous
   } else {
     x.scale.FUN <- ggplot2::scale_x_discrete
   }
 
-  if (y.num | class(dat %>% dplyr::pull(!!y)) == 'numeric') {
+  if (y.num | inherits(dat %>% dplyr::pull(!!y), 'numeric')) {
     dat <- dat %>% dplyr::mutate(!!yname := as.numeric(!!y))
     y.scale.FUN <- ggplot2::scale_y_continuous
   } else {
@@ -224,7 +225,9 @@ ggheatmap <- function(dat,
 
   ## set color palettes
   if (is_null(cols) & limits[[1]] >= 0) {
-    cols <- RColorBrewer::brewer.pal(9, 'YlOrRd')
+    # The same: cols <- RColorBrewer::brewer.pal(9, 'YlOrRd')
+    cols <- c("#FFFFCC", "#FFEDA0", "#FED976", "#FEB24C", "#FD8D3C", "#FC4E2A",
+              "#E31A1C", "#BD0026", "#800026")
   } else if (is_null(cols)) {
     cols <- c("#053061", "#2166ac", "#4393c3", "#92c5de", "#d1e5f0",
               "#f7f7f7", "#fddbc7", "#f4a582", "#d6604d", "#b2182b", "#67001f")
@@ -373,191 +376,4 @@ cnaplot <- function(cna,
     ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5, size = 16),
                    axis.ticks.x = ggplot2::element_blank())
   return(p)
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#' @title Plot a CNA heatmap
-#' @description Uses `ggplot::geom_raster` to generate a plot of copy number aberration (CNA) values. Delineates chromosomes and chromosome arms, and provides options for clustering cells or groups of cells (e.g., cell types, samples, or subclones) prior to plotting.
-#' @param m CNA matrix (genes by cells). <m> can be generated using `Infercna::Infercna`.
-#' @param reorder reorder cells using hierarchical clustering, Default: FALSE
-#' @param reorder.by reorder cells by genes on select chromosomes or chromosome arms, e.g., c("7", "10", "1p", "19q"). Default: NULL
-#' @param groups groups of cells to delineate and label on the plot (e.g., cell types, samples, or subclones). If <reorder> is TRUE, ordering will be performed within groups, Default: NULL
-#' @param interorder reorder by hierarchical clustering betweeen groups, Default: TRUE
-#' @param genome set genome to use ('hg19' or 'hg38'), Default: 'hg19'
-#' @param dist.method distance metric for reordering, Default: 'euclidean'
-#' @param cluster.method linkage method for reordering, Default: 'complete'
-#' @param hide hide x-axis labels for specific chromosomes (e.g., small chromosomes whose labels would overlap flanking labels), Default: c("21", "Y")
-#' @param limits for the colour key; replaces out of bounds values with the nearest limit. Default: c(-1, 1)
-#' @param y.angle y-axis labels' angle, Default: 90
-#' @param legend.title legend title, Default: NULL
-#' @param title plot title, Default: 'Copy-number aberrations'
-#' @param axis.text.size x and y axes label size, Default: 12
-#' @param legend.height legend bar height, Default: 0.3
-#' @param legend.width legend bar width, Default: 0.5
-#' @param cols custom colour palette (character vector), Default: NULL
-#' @param ... other arguments to pass to `ggheatmap`.
-#'
-#' @importFrom stringr str_detect
-#' @importFrom tibble rownames_to_column
-#' @importFrom tidyr pivot_longer
-#'
-#' @return a `ggplot` object
-#' @examples
-#' \dontrun{
-#' m <- Infercna(mgh125, refCells = refCells)
-#' malCells <- list(Malignant = setdiff(colnames(mgh125), unlist(refCells)))
-#' groups <- c(malCells, refCells)
-#' p <- cnaplot(m, reorder = T, groups = refCells)
-#' }
-#' @rdname cnaplot
-#' @export
-cnaplot <- function(m, reorder = FALSE, reorder.by = NULL, groups = NULL, interorder = TRUE,
-                    genome = "hg19", dist.method = "euclidean", cluster.method = "complete",
-                    hide = c("21", "Y"), limits = c(-1, 1), y.angle = 90,
-                    legend.title = NULL, title = "Copy-number aberrations",
-                    axis.text.size = 12, legend.height = grid::unit(0.3, "cm"), legend.width = grid::unit(0.5, "cm"),
-                    cols = NULL, ...) {
-  ## set default color
-  if (is.null(cols)) {
-    cols <- c("#053061", "#2166AC", "#4393C3", "#92C5DE", "#D1E5F0", "#F7F7F7",
-              "white", "#F7F7F7", "#FDDBC7", "#F4A582", "#D6604D", "#B2182B", "#67001F")
-  }
-  # geom vlines,breaks,labels for chr and chr arms
-  chr.size <- 0.1
-  arm.size <- 0.05
-  genes <- rownames(m)
-  useGenome(genome)
-  m <- orderGenes(m)
-  ## chromosome split
-  L <- splitGenes(genes, by = "chr")
-  xints <- cumsum(lengths(L)) + chr.size
-
-  ## bind split
-  L2 <- splitGenes(genes, by = "arm")
-  xints2 <- cumsum(lengths(L2)) + arm.size
-  xints2 <- xints2[str_detect(names(xints2), "p")]
-
-  breaks <- (xints - chr.size) - lengths(L) / 2
-
-  labels <- names(xints)
-  labels[names(xints) %in% hide] <- ""
-
-  ## change gene order by cluster
-  m <- .ggcna_prep(m,
-                   reorder = reorder,
-                   reorder.by = reorder.by,
-                   groups = groups,
-                   genome = genome,
-                   interorder = interorder,
-                   dist.method = dist.method,
-                   cluster.method = cluster.method
-  )
-
-  if (!is.null(groups)) {
-    line.size <- 0.1
-    ord <- colnames(m)
-    groupNames <- flip(Unlist(groups))[ord]
-    groupNames <- groupNames[!duplicated(groupNames)]
-    yints <- cumsum(lengths(groups)) + line.size
-    ybreaks <- (yints - line.size) - lengths(groups) / 2
-    ylabels <- names(yints)
-  } else {
-    ylabels <- ggplot2::waiver()
-    ybreaks <- ggplot2::waiver()
-  }
-
-  d <- as.data.frame(m) %>%
-    rownames_to_column(var = "Var1") %>%
-    pivot_longer(!Var1, names_to = "Var2", values_to = "value") %>%
-    dplyr::mutate(
-      Var1 = as.numeric(factor(as.character(Var1), levels = rownames(m))),
-      Var2 = as.numeric(factor(as.character(Var2), levels = colnames(m)))
-    )
-
-  ## plot
-  G <- ggheatmap(d,
-                 x = Var1, y = Var2, fill = value, limits = limits,
-                 legend.title = legend.title, legend.key.height = legend.height,
-                 legend.key.width = legend.width, ...
-  ) +
-    ggplot2::geom_vline(xintercept = xints, col = "grey20", linetype = 1, size = chr.size) +
-    ggplot2::geom_vline(xintercept = xints2, col = "grey20", linetype = 2, size = arm.size) +
-    ggplot2::scale_x_continuous(breaks = breaks, labels = labels, expand = c(0, 0)) +
-    ggplot2::scale_y_continuous(breaks = ybreaks, labels = ylabels, expand = c(0, 0)) +
-    theme_cna(legend.text.size = 14) +
-    ggplot2::theme(
-      plot.margin = margin(.2, .2, .2, .2, "cm"),
-      plot.title = ggplot2::element_text(hjust = 0.5, size = 16),
-      axis.text = ggplot2::element_text(size = axis.text.size),
-      axis.ticks.x = ggplot2::element_blank(),
-      legend.key.height = legend.height,
-      legend.key.width = legend.width
-    ) +
-    ggplot2::scale_fill_gradientn(
-      name = legend.title,
-      oob = scales::squish,
-      colors = cols,
-      breaks = c(limits[1], 0, limits[2]),
-      limits = limits,
-      guide = ggplot2::guide_colorbar(frame.colour = "black", ticks.colour = "black")
-    ) +
-    ggplot2::labs(title = title)
-
-  if (!is.null(groups)) {
-    G <- G +
-      ggplot2::geom_hline(yintercept = yints, col = "grey20", size = line.size, linetype = 1) +
-      ggplot2::theme(
-        axis.text.y = ggplot2::element_text(angle = y.angle, hjust = 0.5),
-        axis.ticks.y = ggplot2::element_blank()
-      )
-  }
-
-  return(G)
 }

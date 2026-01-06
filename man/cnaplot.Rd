@@ -49,44 +49,19 @@ ggheatmap(
 )
 
 cnaplot(
-  m,
+  cna,
+  genome = "hg19",
   reorder = FALSE,
   reorder.by = NULL,
   groups = NULL,
   interorder = TRUE,
-  genome = "hg19",
   dist.method = "euclidean",
   cluster.method = "complete",
   hide = c("21", "Y"),
   limits = c(-1, 1),
-  y.angle = 90,
-  legend.title = NULL,
-  title = "Copy-number aberrations",
-  axis.text.size = 12,
-  legend.height = grid::unit(0.3, "cm"),
-  legend.width = grid::unit(0.5, "cm"),
   cols = NULL,
-  ...
-)
-
-cnaplot(
-  m,
-  reorder = FALSE,
-  reorder.by = NULL,
-  groups = NULL,
-  interorder = TRUE,
-  genome = "hg19",
-  dist.method = "euclidean",
-  cluster.method = "complete",
-  hide = c("21", "Y"),
-  limits = c(-1, 1),
-  y.angle = 90,
-  legend.title = NULL,
+  legend.title = "Scaled CNA values",
   title = "Copy-number aberrations",
-  axis.text.size = 12,
-  legend.height = grid::unit(0.3, "cm"),
-  legend.width = grid::unit(0.5, "cm"),
-  cols = NULL,
   ...
 )
 }
@@ -103,13 +78,13 @@ cnaplot(
 
 \item{y.num}{description}
 
-\item{limits}{for the colour key; replaces out of bounds values with the nearest limit. Default: c(-1, 1)}
+\item{limits}{for the color key; replaces out of bounds values with the nearest limit. Default: c(-1, 1)}
 
 \item{limits.find}{If used, auto find the value limits to plot heatmap. Default: FALSE}
 
 \item{limits.symmetric}{Used with \code{limits.find}. If used, set the value limits to be symmetrical. Default: FALSE}
 
-\item{cols}{custom colour palette (character vector), Default: NULL}
+\item{cols}{custom color palette (character vector), Default: NULL}
 
 \item{na.value}{The colot of NA value.}
 
@@ -137,9 +112,9 @@ cnaplot(
 
 \item{legend.labels.col}{The legend label color}
 
-\item{legend.width}{legend bar width, Default: 0.5}
+\item{legend.width}{same as \code{legend.width} in \code{\link[ggplot2]{theme}}}
 
-\item{legend.height}{legend bar height, Default: 0.3}
+\item{legend.height}{same as \code{legend.height} in \code{\link[ggplot2]{theme}}}
 
 \item{legend.margin}{same as \code{legend.margin} in \code{\link[ggplot2]{theme}}}
 
@@ -159,7 +134,9 @@ cnaplot(
 
 \item{plot.margin}{same as \code{plot.margin} in \code{\link[ggplot2]{theme}}}
 
-\item{m}{CNA matrix (genes by cells). <m> can be generated using `Infercna::Infercna`.}
+\item{cna}{CNA matrix (genes by cells). It can be generated using \code{\link[Infercna]{Infercna}}.}
+
+\item{genome}{The genome annotation to order the genes.}
 
 \item{reorder}{reorder cells using hierarchical clustering, Default: FALSE}
 
@@ -169,41 +146,21 @@ cnaplot(
 
 \item{interorder}{reorder by hierarchical clustering betweeen groups, Default: TRUE}
 
-\item{genome}{set genome to use ('hg19' or 'hg38'), Default: 'hg19'}
-
 \item{dist.method}{distance metric for reordering, Default: 'euclidean'}
 
 \item{cluster.method}{linkage method for reordering, Default: 'complete'}
 
 \item{hide}{hide x-axis labels for specific chromosomes (e.g., small chromosomes whose labels would overlap flanking labels), Default: c("21", "Y")}
 
-\item{y.angle}{y-axis labels' angle, Default: 90}
-
-\item{axis.text.size}{x and y axes label size, Default: 12}
-
-\item{...}{other arguments to pass to `ggheatmap`.}
-
-\item{cna}{CNA matrix (genes by cells). It can be generated using \code{\link[Infercna]{Infercna}}.}
+\item{...}{Other argument used in \code{\link[Infercna]{ggheatmap}}}
 }
 \value{
 return a ggplot2 object
 
 return a ggplot object
-
-a `ggplot` object
 }
 \description{
 `ggheatmap()` create a heatmap ggplot2 object.
 
 Uses `ggplot::geom_raster` to generate a plot of copy number aberration (CNA) values. Delineates chromosomes and chromosome arms, and provides options for clustering cells or groups of cells (e.g., cell types, samples, or subclones) prior to plotting.
-
-Uses `ggplot::geom_raster` to generate a plot of copy number aberration (CNA) values. Delineates chromosomes and chromosome arms, and provides options for clustering cells or groups of cells (e.g., cell types, samples, or subclones) prior to plotting.
-}
-\examples{
-\dontrun{
-m <- Infercna(mgh125, refCells = refCells)
-malCells <- list(Malignant = setdiff(colnames(mgh125), unlist(refCells)))
-groups <- c(malCells, refCells)
-p <- cnaplot(m, reorder = T, groups = refCells)
-}
 }

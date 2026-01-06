@@ -7,7 +7,8 @@
 cnaScatterPlot(
   cna,
   cor.method = "pearson",
-  gene.quantile = NULL,
+  gene.quantile.for.cor = 0.5,
+  gene.quantile.for.signal = 0.9,
   refCells = NULL,
   samples = NULL,
   verbose = FALSE
@@ -18,7 +19,9 @@ cnaScatterPlot(
 
 \item{cor.method}{character string indicating the method to use for the pairwise correlations. E.g. 'pearson', 'spearman'. Default: 'pearson'}
 
-\item{gene.quantile}{calculate CNA measures including only top / "hotspot" genes according to their squared CNA values across all cells. Value between 0 and 1 denoting the quantile of genes to include. Default: NULL}
+\item{gene.quantile.for.cor}{as above but for CNA correlations specifically. Default: gene.quantile}
+
+\item{gene.quantile.for.signal}{as above but for CNA signal specifically. Default: gene.quantile}
 
 \item{refCells}{a character vector of cell ids to exclude from average CNA profile that each cell is correlated to. You can pass reference normal cell ids to this argument if these are known. Default: NULL}
 
@@ -27,7 +30,7 @@ cnaScatterPlot(
 \item{verbose}{print progress messages. Default: FALSE}
 }
 \value{
-a base R plot. If return value is saved to a variable, instead returns data points for cna correlations and cna signal in list form.
+return a list of cna signal, cna correlation, and ggplot object of plot.
 }
 \description{
 Visualise Malignant and Non-Malignant Subsets of cells. This is achieved by plotting, for each cell, its CNA signal over its CNA correlation. Please see `infercna::cnaSignal` and `infercna::cnaCor` for details.

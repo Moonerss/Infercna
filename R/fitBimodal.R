@@ -13,6 +13,7 @@
 #' @param maxrestarts the maximum number of restarts allowed. See \code{\link[mixtools]{normalmixEM}} for details. Default: 100
 #' @param bySampling logical; if TRUE, the function uses a bootstrapping method to subsample values and identify the two modes iteratively. This method is more sensitive to differing mode sizes, so will be useful if you believe one group to be much smaller than the other. Default: TRUE
 #' @param nsamp the number of bootstrap replicates.
+#' @param ... Other argument for methods
 #'
 #' @return The posterior probabilities of each observation to one of two modes. If boolean = TRUE, return a boolean value indicating whether bimodality was found. If assign = TRUE, return a list of length two with the observations (IDs) in each mode.
 #'
@@ -23,6 +24,7 @@
 #' @importFrom stats setNames
 #' @importFrom nor1mix norMixEM estep.nm
 #' @importFrom dplyr mutate
+#' @importFrom rlang is_false
 #'
 fitBimodal <- function(x,
                       prob = 0.95,
@@ -148,7 +150,7 @@ fitBimodal <- function(x,
                       verbose = verbose,
                       maxit = maxit)
 
-    if (is_false(res)) next()
+    if (rlang::is_false(res)) next()
     if (i > 3 & length(intersect(a, res$a)) == 0) next()
     if (i > 3 & length(intersect(b, res$a)) != 0) next()
     if (i > 3 & length(intersect(b, res$b)) == 0) next()

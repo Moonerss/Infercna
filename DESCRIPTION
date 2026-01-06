@@ -26,8 +26,8 @@ Imports:
     Matrix,
     matrixStats,
     nor1mix,
+    reshape2,
     rlang,
     scales,
     stringr,
-    tibble,
-    tidyr
+    tibble
