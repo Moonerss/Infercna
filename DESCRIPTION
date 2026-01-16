@@ -29,6 +29,7 @@ Imports:
     reshape2,
     rlang,
     scales,
+    stats,
     stringr,
     tibble
 URL: https://moonerss.github.io/Infercna/
