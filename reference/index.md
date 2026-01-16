@@ -29,11 +29,20 @@
 - [`cnaHotspotGenes()`](https://moonerss.github.io/Infercna/reference/cnaHotspotGenes.md)
   : Find the Genes with the highest CNA signal
 
-- [`cnaScatterPlot()`](https://moonerss.github.io/Infercna/reference/cnaScatterPlot.md)
-  : Visualise Malignant and Non-Malignant Subsets
-
 - [`cnaSignal()`](https://moonerss.github.io/Infercna/reference/cnaSignal.md)
   : Calculate the Means of Squared CNA Values
+
+- [`cna_classify_cells()`](https://moonerss.github.io/Infercna/reference/cna_classify_cells.md)
+  : Classify CNA scores
+
+- [`cna_classify_cells_with_cluster()`](https://moonerss.github.io/Infercna/reference/cna_classify_cells_with_cluster.md)
+  : Identify Malignant cells with cluster info
+
+- [`cna_compute_scores()`](https://moonerss.github.io/Infercna/reference/cna_compute_scores.md)
+  : Compute the cell CNA score
+
+- [`cna_scores_plot()`](https://moonerss.github.io/Infercna/reference/cna_scores_plot.md)
+  : Visualise of cna signal and correlation
 
 - [`ggheatmap()`](https://moonerss.github.io/Infercna/reference/cnaplot.md)
   [`cnaplot()`](https://moonerss.github.io/Infercna/reference/cnaplot.md)

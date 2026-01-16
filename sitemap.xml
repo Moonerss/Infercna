@@ -12,8 +12,11 @@
 <url><loc>https://moonerss.github.io/Infercna/reference/cnaCor.html</loc></url>
 <url><loc>https://moonerss.github.io/Infercna/reference/cnaHotspotCells.html</loc></url>
 <url><loc>https://moonerss.github.io/Infercna/reference/cnaHotspotGenes.html</loc></url>
-<url><loc>https://moonerss.github.io/Infercna/reference/cnaScatterPlot.html</loc></url>
 <url><loc>https://moonerss.github.io/Infercna/reference/cnaSignal.html</loc></url>
+<url><loc>https://moonerss.github.io/Infercna/reference/cna_classify_cells.html</loc></url>
+<url><loc>https://moonerss.github.io/Infercna/reference/cna_classify_cells_with_cluster.html</loc></url>
+<url><loc>https://moonerss.github.io/Infercna/reference/cna_compute_scores.html</loc></url>
+<url><loc>https://moonerss.github.io/Infercna/reference/cna_scores_plot.html</loc></url>
 <url><loc>https://moonerss.github.io/Infercna/reference/cnaplot.html</loc></url>
 <url><loc>https://moonerss.github.io/Infercna/reference/colcenter.html</loc></url>
 <url><loc>https://moonerss.github.io/Infercna/reference/comply.html</loc></url>
